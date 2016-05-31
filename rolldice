@@ -1,0 +1,43 @@
+#!/usr/local/bin/python
+"""Roll dice from the command line"""
+
+import random
+import sys
+
+USAGE = __doc__ + """
+    usage: python rolldice.py (<n>)d<m> [(<n>)d<m> ...]
+        n: number of dice to roll (n = 1 if omitted)
+        m: the maximum value on the die (must be at least 1)
+     e.g.:   'd6' -> roll single six-sided die
+           '3d20' -> roll three twenty-sided dice"""
+
+def parse(die):
+    """parse('1d6') -> (1, 6)"""
+    n, d = die.lower().split('d')
+    return map(int, (n or 1, d))
+
+def roll(n, d):
+    """generate n random integers in the range [1..d]"""
+    for i in range(n):
+        yield random.randint(1, d)
+
+def main(dice):
+    """parse a list of dice and print each die interpretation with its result"""
+    for die in dice:
+        n, d = parse(die)
+        print '{}d{}\t{}'.format(n, d, sum(r for r in roll(n, d)))
+
+def usage():
+    """print usage instructions to stderr"""
+    print >> sys.stderr, USAGE
+
+if __name__ == '__main__':
+    script, dice = sys.argv[0], sys.argv[1:]
+    if (not dice) or dice[0].lower() in ('-h', '--help'):
+        usage()
+        sys.exit(0)
+    try:
+        main(dice)
+    except:
+        usage()
+        sys.exit(1)
