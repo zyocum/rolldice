@@ -4,12 +4,17 @@
 import random
 import sys
 
-USAGE = __doc__ + """
-    usage: ./rolldice (<n>)d<m> [(<n>)d<m> ...]
+def usage():
+    """print usage instructions to stderr"""
+    print >> sys.stderr, __doc__ + \
+    """
+    usage: ./rolldice (n)dm [(n)dm ...]
         n: number of dice to roll (n = 1 if omitted)
         m: the maximum value on the die (must be at least 1)
      e.g.:   'd6' -> roll single six-sided die
-           '3d20' -> roll three twenty-sided dice"""
+           '3d20' -> roll three twenty-sided dice
+       'd2 d3 d4' -> roll a two-, three-, and four-sided die
+    """
 
 def parse(die):
     """parse('1d6') -> (1, 6)"""
@@ -25,19 +30,12 @@ def main(dice):
     """parse a list of dice and print each die interpretation with its result"""
     for die in dice:
         n, d = parse(die)
-        print '{}d{}\t{}'.format(n, d, sum(r for r in roll(n, d)))
-
-def usage():
-    """print usage instructions to stderr"""
-    print >> sys.stderr, USAGE
+        print '{}d{}\t{}'.format(n, d, sum(roll(n, d)))
 
 if __name__ == '__main__':
     script, dice = sys.argv[0], sys.argv[1:]
     if (not dice) or dice[0].lower() in ('-h', '--help'):
         usage()
         sys.exit(0)
-    try:
+    else:
         main(dice)
-    except:
-        usage()
-        sys.exit(1)
