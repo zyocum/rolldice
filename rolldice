@@ -1,41 +1,53 @@
-#!/usr/bin/env python
-"""Roll dice from the command line"""
+#!/usr/bin/env python3
+"""Roll dice from the command line
+    
+    Roll N M-sided die where
+        N: number of dice to roll (implicitly N=1 if omitted)
+        M: the maximum value on the die (must be at least 1)
+     e.g.:   'd6' -> roll one six-sided die
+           '3d20' -> roll three twenty-sided dice
+       'd2 d3 d4' -> roll a two-, three-, and four-sided die
+"""
 
 import random
 import sys
 
-def usage():
-    """print usage instructions to stderr"""
-    print >> sys.stderr, __doc__ + \
-    """
-    usage: ./rolldice (n)dm [(n)dm ...]
-        n: number of dice to roll (n = 1 if omitted)
-        m: the maximum value on the die (must be at least 1)
-     e.g.:   'd6' -> roll single six-sided die
-           '3d20' -> roll three twenty-sided dice
-       'd2 d3 d4' -> roll a two-, three-, and four-sided die
-    """
+from argparse import ArgumentError
 
-def parse(die):
-    """parse('1d6') -> (1, 6)"""
-    n, d = die.lower().split('d')
-    return map(int, (n or 1, d))
+def die(value):
+    """Parse a die string of the form (N)dM int a tuple of integers where:
+        N: an optional number of dice (implicitly N=1 if omitted)
+        M: the number of sides on the die
+    
+    E.g.:
+        parse('d6') -> (1, 6)
+        parse('1d6') -> (1, 6)
+        parse('2d4') -> (2, 4)
+    """
+    try:
+        n, m = value.lower().split('d', 1)
+        return int(n or 1), int(m)
+    except:
+        raise ArgumentError('invalid die string')
 
-def roll(n, d):
-    """generate n random integers in the range [1..d]"""
+def roll(n, m):
+    """Generate n random integers in the range [1..m]"""
     for i in range(n):
-        yield random.randint(1, d)
-
-def main(dice):
-    """parse a list of dice and print each die interpretation with its result"""
-    for die in dice:
-        n, d = parse(die)
-        print '{}d{}\t{}'.format(n, d, sum(roll(n, d)))
+        yield random.randint(1, m)
 
 if __name__ == '__main__':
-    script, dice = sys.argv[0], sys.argv[1:]
-    if (not dice) or dice[0].lower() in ('-h', '--help'):
-        usage()
-        sys.exit(0)
-    else:
-        main(dice)
+    import argparse
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        description=__doc__
+    )
+    parser.add_argument(
+        'dice',
+        nargs='+',
+        type=die,
+        metavar='[N]dM',
+        help='roll N M-sided dice',
+    )
+    args = parser.parse_args()
+    for n, m in args.dice:
+        print('{}d{}\t{}'.format(n, m, sum(roll(n, m))))
