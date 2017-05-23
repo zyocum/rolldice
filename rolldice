@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-"""Roll dice from the command line
+"""Roll N M-sided dice from the command line.
     
-    Roll N M-sided die where
         N: number of dice to roll (implicitly N=1 if omitted)
         M: the maximum value on the die (must be at least 1)
      e.g.:   'd6' -> roll one six-sided die
@@ -46,7 +45,7 @@ if __name__ == '__main__':
         nargs='+',
         type=die,
         metavar='[N]dM',
-        help='roll N M-sided dice',
+        help='Roll N M-sided dice',
     )
     args = parser.parse_args()
     for n, m in args.dice:
