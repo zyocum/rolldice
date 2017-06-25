@@ -19,9 +19,9 @@ def die(value):
         M: the number of sides on the die
     
     E.g.:
-        parse('d6') -> (1, 6)
-        parse('1d6') -> (1, 6)
-        parse('2d4') -> (2, 4)
+        die('d6') -> (1, 6)
+        die('1d6') -> (1, 6)
+        die('2d4') -> (2, 4)
     """
     try:
         n, m = value.lower().split('d', 1)
